@@ -229,7 +229,7 @@ public:
 
 	//TMap
 	UPROPERTY(VisibleAnywhere)
-	TMap<FName, int> BoneMap;
+	TMap<FName, int> BonePriorityMap;
 	//무기 TMap
 	UPROPERTY(VisibleAnywhere)
 	TMap<FName, int> WeaponMap;

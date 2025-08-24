@@ -44,6 +44,9 @@ void AZombieSpawnManager::BeginPlay()
 		SpawnPoints.Add(Cast<AZombieSpawnPoint>(Actor));
 	}
 
+	ActiveZombies.Reserve(MaxZombieCount);
+
+	// 미리 레벨에 배치되어있는 좀비들을 등록 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACommonZombie::StaticClass(), Actors);
 	for (auto* Actor : Actors)
 	{
@@ -53,6 +56,7 @@ void AZombieSpawnManager::BeginPlay()
 		ActiveZombies.Add(Cast<ACommonZombie>(Actor));
 	}
 
+	// 최대 스폰 가능한 좀비의 수 만큼 좀비를 새로 생성한 뒤 등록
 	for (int i = 0; i < MaxZombieCount - ActiveZombies.Num(); i++)
 	{
 		FActorSpawnParameters SpawnParams;
@@ -81,6 +85,7 @@ void AZombieSpawnManager::EnqueueZombie(ACommonZombie* Zombie)
 			Zombie->GetCharacterMovement()->bUseRVOAvoidance = false;
 		}
 		
+		// 좀비를 리스폰 대기열에 넣고 활성화 집합에서 뺀다
 		PoolCount++;
 		ZombiePool.Enqueue(Zombie);
 		ActiveZombies.Remove(Zombie);

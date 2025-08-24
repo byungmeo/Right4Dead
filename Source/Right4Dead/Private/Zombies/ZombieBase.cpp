@@ -19,7 +19,13 @@
 AZombieBase::AZombieBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	// 좀비의 Tick 간격을 늘려 좀비가 대규모로 활성화되었을 때 부담을 줄임
 	SetActorTickInterval(0.1f);
+	/*
+	 *	ObjectPooling을 통해 게임이 끝날 때 까지 GC에 의해 정리될 일이 없으므로
+	 *	Cluster로 묶어 GC 도달 가능성 분석을 빠르게 개선할 수 있도록 활성화
+	 */
+	bCanBeInCluster = true;
 	
 	AIControllerClass = ACommonZombieAIController::StaticClass();
 	FinalDamage = 0;
@@ -200,7 +206,7 @@ void AZombieBase::OnTakePointDamageHandler(AActor* DamagedActor, float Damage, c
 	FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection,
 	const class UDamageType* DamageType, AActor* DamageCauser)
 {
-	const FName ParentBoneName = UR4DHelper::GetParentBone(GetMesh(), BoneName);
+	const FName ParentBoneName = UR4DHelper::GetSignatureBone(GetMesh(), BoneName);
 	if (ParentBoneName == TEXT("neck_01"))
 	{
 		Damage *= PartDamageMultipliers.Head;

@@ -122,7 +122,7 @@ AStaticMeshActor* SpawnPartMesh(USkeletalMeshComponent* SkeletalMesh, FName Bone
 void ACommonZombie::TriggerDismemberment(const FPointDamageEvent* PointDamageEvent) const
 {
 	PRINT_CALLINFO();
-	const FName ParentBoneName = UR4DHelper::GetParentBone(GetMesh(), PointDamageEvent->HitInfo.BoneName);
+	const FName ParentBoneName = UR4DHelper::GetSignatureBone(GetMesh(), PointDamageEvent->HitInfo.BoneName);
 	const FVector ShotDirection = PointDamageEvent->ShotDirection.GetSafeNormal();
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *ShotDirection.ToString());
 	AStaticMeshActor* SpawnedMesh = nullptr; 

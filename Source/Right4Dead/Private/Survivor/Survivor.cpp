@@ -196,33 +196,33 @@ ASurvivor::ASurvivor()
 	//TODO: None이면 예외 처리 해야함
 
 	// 머리
-    BoneMap.Add(TEXT("head"), 0);
-	BoneMap.Add(TEXT("neck_01"), 0);
+    BonePriorityMap.Add(TEXT("head"), 0);
+	BonePriorityMap.Add(TEXT("neck_01"), 0);
 
 	// 가슴
-	BoneMap.Add(TEXT("spine_02"), 1);
+	BonePriorityMap.Add(TEXT("spine_02"), 1);
 
 	// 배
-	BoneMap.Add(TEXT("pelvis"), 2);
-	BoneMap.Add(TEXT("spine_01"), 2);
+	BonePriorityMap.Add(TEXT("pelvis"), 2);
+	BonePriorityMap.Add(TEXT("spine_01"), 2);
 
 	// 팔
-	BoneMap.Add(TEXT("upperarm_l"), 3);
-	BoneMap.Add(TEXT("lowerarm_l"), 3);
-	BoneMap.Add(TEXT("hand_l"), 3);
-	BoneMap.Add(TEXT("upperarm_r"), 3);
-	BoneMap.Add(TEXT("lowerarm_r"), 3);
-	BoneMap.Add(TEXT("hand_r"), 3);
+	BonePriorityMap.Add(TEXT("upperarm_l"), 3);
+	BonePriorityMap.Add(TEXT("lowerarm_l"), 3);
+	BonePriorityMap.Add(TEXT("hand_l"), 3);
+	BonePriorityMap.Add(TEXT("upperarm_r"), 3);
+	BonePriorityMap.Add(TEXT("lowerarm_r"), 3);
+	BonePriorityMap.Add(TEXT("hand_r"), 3);
 
 	// 다리
-	BoneMap.Add(TEXT("thigh_l"), 3);
-	BoneMap.Add(TEXT("calf_l"), 3);
-	BoneMap.Add(TEXT("foot_l"), 3);
-	BoneMap.Add(TEXT("ball_l"), 3);
-	BoneMap.Add(TEXT("thigh_r"), 3);
-	BoneMap.Add(TEXT("calf_r"), 3);
-	BoneMap.Add(TEXT("foot_r"), 3);
-	BoneMap.Add(TEXT("ball_r"), 3);
+	BonePriorityMap.Add(TEXT("thigh_l"), 3);
+	BonePriorityMap.Add(TEXT("calf_l"), 3);
+	BonePriorityMap.Add(TEXT("foot_l"), 3);
+	BonePriorityMap.Add(TEXT("ball_l"), 3);
+	BonePriorityMap.Add(TEXT("thigh_r"), 3);
+	BonePriorityMap.Add(TEXT("calf_r"), 3);
+	BonePriorityMap.Add(TEXT("foot_r"), 3);
+	BonePriorityMap.Add(TEXT("ball_r"), 3);
 
 	//사운드 재생
 	//도끼
@@ -981,7 +981,7 @@ void ASurvivor::Sweep()
    
     // 충돌결과 저장을 위한 배열 선언
     // SweepMultiByChannel이 수행되면 여기에 HitResult 구조체(충돌과 관련된 정보들이 들어있음)들이 쌓인다
-    TArray<struct FHitResult> HitResults;
+    TArray<struct FHitResult> SweepHitResults;
   
     // 시작과 끝점 (박스의 중심), 현재의 80은 캐릭터의 머리위치 정도인듯
     // 시작 지점과 끝 지점은 같도록 하면 된다 (Z축 좌표를 모니터 정 중앙 위치를 기준으로)
@@ -1020,7 +1020,7 @@ void ASurvivor::Sweep()
     Params.AddIgnoredActor(this);
 
     // SweepMultiByChannel 수행
-    const bool bHit = GetWorld()->SweepMultiByChannel(HitResults, Start, End, CameraRotation.Quaternion(), ECC_GameTraceChannel10, BoxShape, Params);
+    const bool bHit = GetWorld()->SweepMultiByChannel(SweepHitResults, Start, End, CameraRotation.Quaternion(), ECC_GameTraceChannel10, BoxShape, Params);
 	// ->HitResults 배열에 충돌 결과들이 저장된다
 
 	if (bDebugPlay)
@@ -1029,83 +1029,84 @@ void ASurvivor::Sweep()
 	}
 	
 	//5. 충돌결과 처리
-    // 만약 가상의 박스 안에 뭔가가 있었다면?
-    if (bHit)
-    {
-    	//좀비 사운드 재생하자
-    	UGameplayStatics::PlaySound2D(this, SwingHitZombie, 1, 1);
-    	
-    	//공격을 맞췄다는 변수 true
-    	bIsAttacked = true;
-    	AttackZombieUI->PlayAnimationByName(this);
-    	
+	// 만약 가상의 박스 안에 뭔가가 있었다면?
+	if (bHit)
+	{
+	    //좀비 사운드 재생하자
+	    UGameplayStatics::PlaySound2D(this, SwingHitZombie, 1, 1);
+	    
+	    //공격을 맞췄다는 변수 true
+	    bIsAttacked = true;
+	    AttackZombieUI->PlayAnimationByName(this);
+	    
 		// 한 액터(좀비)의 여러 부위(왼쪽팔, 머리, 오른쪽팔)가 박스 영역 안에 동시에 들어왔을때 분류 (한 번만 타격!)
-        TMap<AActor*, TArray<FName>> HitMap;
+	    TMap<AActor*, TArray<FName>> ActorHitBoneMap;
 
-        // HitResults에서 각각의 HitResult를 꺼내서 확인
-        for (auto HitResult : HitResults)
-        {
+	    // SweepHitResults에서 각각의 HitResult를 꺼내서 확인하고 액터별 피격 부위를 ActorHitBoneMap에 저장한다.
+	    for (const FHitResult& HitResult : SweepHitResults)
+	    {
 			// 만약 BoneName이 None이라면 SkeletalMesh가 아니라는 뜻이다. 스킵하자.
-            FName BoneName = HitResult.BoneName;
-            if (HitResult.BoneName.IsNone())
+	        FName BoneName = HitResult.BoneName;
+	        if (HitResult.BoneName.IsNone())
 			{
 				continue;
-            }
+	        }
 
 			// 좀비가 아니라면 스킵하자.
-            AActor* Actor = Cast<AZombieBase>(HitResult.GetActor());
-            if (nullptr == Actor)
-            {
-                continue;
-            }
-        	
+	        AActor* Actor = Cast<AZombieBase>(HitResult.GetActor());
+	        if (nullptr == Actor)
+	        {
+	            continue;
+	        }
+	        
 			// Actor의 BoneName 부위가 피격당했다
-            // 해당 Actor가 아직 없다면 새로운 배열(TArray))을 만들고 피격부위(BoneName)를 추가한 후 HitMAp에 저장
-            if (false == HitMap.Contains(Actor))
-            {
-               TArray<FName> BoneArray;
-               BoneArray.Add(BoneName);
-               HitMap.Add(Actor, BoneArray);
-            }
-            // 이미 존재한다면 기존의 TArray를 가져와서 BoneName을 추가한다.
-            else
-            {
-               /*auto Array = HitMap[Actor];
-               Array.Add(BoneName);
-               -> Array는 복사본이므로 원본에 영향을 주지 않는다고 함*/
-               HitMap[Actor].Add(BoneName); //기존 배열에 직접 추가
-            }
+	        // 해당 Actor가 아직 없다면 새로운 배열(TArray))을 만들고 피격부위(BoneName)를 추가한 후 HitMAp에 저장
+	        if (false == ActorHitBoneMap.Contains(Actor))
+	        {
+	           TArray<FName> BoneArray;
+	           BoneArray.Add(BoneName);
+	           ActorHitBoneMap.Add(Actor, BoneArray);
+	        }
+	        // 이미 존재한다면 기존의 TArray를 가져와서 BoneName을 추가한다.
+	        else
+	        {
+	           /*auto Array = HitMap[Actor];
+	           Array.Add(BoneName);
+	           -> Array는 복사본이므로 원본에 영향을 주지 않는다고 함*/
+	           ActorHitBoneMap[Actor].Add(BoneName); //기존 배열에 직접 추가
+	        }
 		}
 
-		// TMap의 Key값은 각각의 좀비를 의미한다.
-        // GetKeys를 통해 어떤 좀비들이 피격을 당했는지 알아낸다.
-        TArray<AActor*> Actors;
-        HitMap.GetKeys(Actors);
-      
-        // 피격을 당한 좀비들을 하나하나 알아본다.
-        for (auto Actor : Actors)
-        {
+		// ActorHitBoneMap의 Key값은 각각의 좀비를 의미하니 GetKeys를 통해 어떤 좀비들이 피격을 당했는지 알아낸다.
+	    TArray<AActor*> HitZombies;
+	    ActorHitBoneMap.GetKeys(HitZombies);
+	  
+	    // 피격을 당한 좀비들을 하나하나 알아본다.
+	    for (AActor* HitZombie : HitZombies)
+	    {
 			int HighPriority = INT_MAX;
-            FName HighPriorityBoneName;
-            // 피격 당한 부위들을 하나하나 살펴본다.
-			for (auto BoneName : HitMap[Actor])
+	        FName HighPriorityBoneName = NAME_None;
+	        // 피격 당한 부위들을 하나하나 살펴본다.
+			for (const FName& BoneName : ActorHitBoneMap[HitZombie])
 			{
-				// 뼈 이름
-		        int Priority = BoneMap[BoneName];
+				// TMap<FName, int> BonePriorityMap : 미리 정의된 BoneName별 우선순위 Map
+		        const int Priority = BonePriorityMap[BoneName];
 		        if (Priority < HighPriority)
 				{
 					HighPriority = Priority;
 		            HighPriorityBoneName = BoneName;
 		        }
 		    }
-
+	        
        		// 어떤 부위들을 피격 당했는지 알았으니 우선순위가 가장 높은 Bone에 맞았다고 하고 데미지 주기
-       		// 좀비는 포인트 데미지 주자
-	        FHitResult HR;
-	        HR.BoneName = HighPriorityBoneName;
-	        UGameplayStatics::ApplyPointDamage(Actor, 9999, GetActorRightVector() * -1.0f, HR, GetController(), this, UMeleeDamageType::StaticClass());
-        }
-   }
+	        FHitResult FinalHitResult;
+	        FinalHitResult.BoneName = HighPriorityBoneName;
+	    	UGameplayStatics::ApplyPointDamage(HitZombie, ..., FinalHitResult, ...);
+	    	UGameplayStatics::ApplyPointDamage(HitZombie, 9999,
+	    		GetActorRightVector() * -1.0f, FinalHitResult, GetController(),
+	    		this, UMeleeDamageType::StaticClass());
+	    }
+	}
 	else
 	{
 		// 헛스윙 사운드 재생

@@ -7,37 +7,28 @@
 /// @param SkeletalMeshComp Bone이 포함된 Skeletal Mesh Component
 /// @param BoneName 
 /// @return Bone이 속한 부위를 대표하는 Bone의 이름
-FName UR4DHelper::GetParentBone(const USkeletalMeshComponent* SkeletalMeshComp, const FName& BoneName)
+FName UR4DHelper::GetSignatureBone(const USkeletalMeshComponent* SkeletalMeshComp, const FName& BoneName)
 {
 	if (BoneName.IsNone())
 	{
 		return BoneName;
 	}
 	
-	if (IsChildBone(SkeletalMeshComp, BoneName, TEXT("neck_01")))
+	static const TArray<FName> SignatureBoneNames {
+		TEXT("neck_01"),
+		TEXT("lowerarm_l"), TEXT("lowerarm_r"),
+		TEXT("thigh_l"), TEXT("thigh_r"),
+		TEXT("spine_02")
+	};
+
+	for (const FName& SignatureBoneName : SignatureBoneNames)
 	{
-		return TEXT("neck_01");
+		if (IsChildBone(SkeletalMeshComp, BoneName, SignatureBoneName))
+		{
+			return SignatureBoneName;
+		}
 	}
-	if (IsChildBone(SkeletalMeshComp, BoneName, TEXT("lowerarm_l")))
-	{
-		return TEXT("lowerarm_l");	
-	}
-	if (IsChildBone(SkeletalMeshComp, BoneName, TEXT("lowerarm_r")))
-	{
-		return TEXT("lowerarm_r");
-	}
-	if (IsChildBone(SkeletalMeshComp, BoneName, TEXT("thigh_l")))
-	{
-		return TEXT("thigh_l");	
-	}
-	if (IsChildBone(SkeletalMeshComp, BoneName, TEXT("thigh_r")))
-	{
-		return TEXT("thigh_r");
-	}
-	if (IsChildBone(SkeletalMeshComp, BoneName, TEXT("spine_02")))
-	{
-		return TEXT("spine_02");
-	}
+	
 	return FName(NAME_None);
 }
 
