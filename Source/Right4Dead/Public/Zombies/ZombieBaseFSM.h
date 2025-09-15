@@ -39,7 +39,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category="Debugging")
 	EZombieState State = EZombieState::EZS_Idle;
-	void SetState(const EZombieState NewState);
+	virtual void SetState(const EZombieState NewState);
 	UPROPERTY(BlueprintAssignable)
 	FOnChangedState OnChangedState;
 

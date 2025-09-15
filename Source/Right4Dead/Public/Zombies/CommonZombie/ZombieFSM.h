@@ -24,6 +24,8 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
+
+	virtual void SetState(const EZombieState NewState);
 	
 	/*
 	 *Idle
@@ -56,8 +58,6 @@ public:
 	/*
 	 * Owner 측에서 상태 관련 처리만 위임
 	 */
-	virtual void HandleShove(const FVector& FromLocation) override;
-	virtual void HandleDamage() override;
 	virtual void HandleDie() override;
 	
 	
