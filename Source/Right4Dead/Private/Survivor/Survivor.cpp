@@ -1101,7 +1101,6 @@ void ASurvivor::Sweep()
        		// 어떤 부위들을 피격 당했는지 알았으니 우선순위가 가장 높은 Bone에 맞았다고 하고 데미지 주기
 	        FHitResult FinalHitResult;
 	        FinalHitResult.BoneName = HighPriorityBoneName;
-	    	UGameplayStatics::ApplyPointDamage(HitZombie, ..., FinalHitResult, ...);
 	    	UGameplayStatics::ApplyPointDamage(HitZombie, 9999,
 	    		GetActorRightVector() * -1.0f, FinalHitResult, GetController(),
 	    		this, UMeleeDamageType::StaticClass());
@@ -1109,7 +1108,7 @@ void ASurvivor::Sweep()
 	}
 	else
 	{
-		// 헛스윙 사운드 재생
+		// TODO: 헛스윙 사운드 재생
 	}
 }
 
