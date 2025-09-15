@@ -34,19 +34,13 @@ public:
 	UPROPERTY(VisibleInstanceOnly, Category="Debugging")
 	TObjectPtr<AActor> InitTarget = nullptr;
 	
-	
-	
 	UPROPERTY()
 	TObjectPtr<USoundWave> HordeComingSound = nullptr;
-
-	
-	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, Category="Debugging")
 	int NumOfHorde = 30;
 	UFUNCTION(CallInEditor, BlueprintCallable, Category="Debugging")
 	void CallHorde();
-
 	
 	void EnqueueZombie(ACommonZombie* Zombie);
 	
