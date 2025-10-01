@@ -80,13 +80,17 @@ void AZombieSpawnManager::EnqueueZombie(ACommonZombie* Zombie)
 	{
 		// 좀비가 죽은 경우 각종 기능을 비활성화
 		{
-			// 틱 중단
+			// 좀비 액터 Tick 및 Collision 비활성화
 			Zombie->SetActorTickEnabled(false);
-			Zombie->ZombieFSM->SetComponentTickEnabled(false);
-			// 애니메이션 업데이트를 중단
-			Zombie->ZombieAnimInstance->EnableUpdateAnimation(false);
-			// AI Controller의 군중 회피 기능 비활성화
-			Zombie->GetCharacterMovement()->bUseRVOAvoidance = false;
+			Zombie->SetActorEnableCollision(false);
+
+			// 자식 컴포넌트 비활성화
+			TArray<UActorComponent*> Components;
+			Zombie->GetComponents(Components);
+			for (auto* Component : Components)
+			{
+				Component->Deactivate();
+			}
 		}
 		
 		// 좀비를 리스폰 대기열에 넣고 활성화 집합에서 뺀다
@@ -142,7 +146,7 @@ void AZombieSpawnManager::CallHorde()
 			if (--Rem < 0) break;
 			ACommonZombie* Zombie = DequeueZombie();
 			if (nullptr == Zombie) continue;
-
+			
 			// 좀비를 초기 상태로 복원한 뒤 스폰 위치로 이동시킨다
 			Zombie->GetMesh()->SetSimulatePhysics(false);
             Zombie->GetMesh()->SetCollisionProfileName(TEXT("CharacterMesh"));
@@ -155,9 +159,15 @@ void AZombieSpawnManager::CallHorde()
 			Zombie->SetActorRotation(SpawnPoint->GetActorRotation(), ETeleportType::TeleportPhysics);
 			
 			Zombie->SetActorTickEnabled(true);
-			Zombie->ZombieFSM->SetComponentTickEnabled(true);
-			Zombie->ZombieAnimInstance->EnableUpdateAnimation(true);
-			Zombie->GetCharacterMovement()->bUseRVOAvoidance = true;
+			Zombie->SetActorEnableCollision(true);
+
+			// 자식 컴포넌트 활성화
+			TArray<UActorComponent*> Components;
+			Zombie->GetComponents(Components);
+			for (auto* Component : Components)
+			{
+				Component->Activate();
+			}
 		}
 	}
 }
