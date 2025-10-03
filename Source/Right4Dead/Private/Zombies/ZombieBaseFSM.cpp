@@ -10,14 +10,18 @@
 UZombieBaseFSM::UZombieBaseFSM()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	bAutoActivate = true;
 }
+
 void UZombieBaseFSM::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	// Verbose 세팅은 인스턴스에서만 껏다 켯다 할 수 있도록 함
 	bVerboseSearch = false;
 }
+
 void UZombieBaseFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

@@ -9,11 +9,7 @@
 // Sets default values for this component's properties
 UZombieEffectComponent::UZombieEffectComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 
@@ -29,14 +25,5 @@ void UZombieEffectComponent::BeginPlay()
 		Owner->OnMeleeHit.AddDynamic(this, &UZombieEffectComponent::OnMeleeHit);
 		Owner->OnDead.AddDynamic(this, &UZombieEffectComponent::OnDead);
 	}
-}
-
-// Called every frame
-void UZombieEffectComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                           FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 

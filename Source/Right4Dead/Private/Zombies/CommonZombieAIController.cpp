@@ -3,6 +3,10 @@
 
 #include "CommonZombieAIController.h"
 
+#include "BrainComponent.h"
+#include "Navigation/PathFollowingComponent.h"
+#include "Perception/AIPerceptionComponent.h"
+
 
 // Sets default values
 ACommonZombieAIController::ACommonZombieAIController()
@@ -25,4 +29,40 @@ void ACommonZombieAIController::BeginPlay()
 void ACommonZombieAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+}
+
+void ACommonZombieAIController::SetActivate(bool bNewActive)
+{
+	if (bIsActive != bNewActive)
+	{
+		bIsActive = bNewActive;
+		
+		// BrainComponent 활성/비활성화
+		if (BrainComponent)
+		{
+			if (bIsActive)
+			{
+				BrainComponent->RestartLogic();
+			}
+			else
+			{
+				BrainComponent->StopLogic("Pawn is inactive");
+			}
+		}
+		
+		// AIPerception 활성/비활성화
+		if (UAIPerceptionComponent* PerceptionComp = GetAIPerceptionComponent())
+		{
+			PerceptionComp->SetActive(bIsActive);
+		}
+		
+		// PathFollowingComponent 활성/비활성화
+		if (UPathFollowingComponent* PathFollowingComp = GetPathFollowingComponent())
+		{
+			PathFollowingComp->SetActive(bIsActive);
+		}
+
+		SetActorTickEnabled(bIsActive);
+	}
 }

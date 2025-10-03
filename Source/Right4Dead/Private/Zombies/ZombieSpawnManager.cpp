@@ -4,6 +4,7 @@
 #include "ZombieSpawnManager.h"
 
 #include "CommonZombie.h"
+#include "CommonZombieAIController.h"
 #include "Survivor.h"
 #include "ZombieAnimInstance.h"
 #include "ZombieBaseFSM.h"
@@ -16,7 +17,8 @@
 AZombieSpawnManager::AZombieSpawnManager()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+	
 	const ConstructorHelpers::FObjectFinder<USoundWave> SoundObj(TEXT("/Script/Engine.SoundWave'/Game/Assets/Sounds/Horde/HordeComingSound.HordeComingSound'"));
 	if (SoundObj.Succeeded())
 	{
@@ -83,6 +85,8 @@ void AZombieSpawnManager::EnqueueZombie(ACommonZombie* Zombie)
 			// 좀비 액터 Tick 및 Collision 비활성화
 			Zombie->SetActorTickEnabled(false);
 			Zombie->SetActorEnableCollision(false);
+			auto* AI = Cast<ACommonZombieAIController>(Zombie->GetController());
+			AI->SetActivate(false);
 
 			// 자식 컴포넌트 비활성화
 			TArray<UActorComponent*> Components;
@@ -160,6 +164,8 @@ void AZombieSpawnManager::CallHorde()
 			
 			Zombie->SetActorTickEnabled(true);
 			Zombie->SetActorEnableCollision(true);
+			auto* AI = Cast<ACommonZombieAIController>(Zombie->GetController());
+			AI->SetActivate(true);
 
 			// 자식 컴포넌트 활성화
 			TArray<UActorComponent*> Components;

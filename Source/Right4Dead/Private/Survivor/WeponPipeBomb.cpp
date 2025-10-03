@@ -56,6 +56,8 @@ void AWeponPipeBomb::BeginPlay()
 	// 플레이어 캐스팅
 	me = Cast<ASurvivor>(GetWorld()->GetFirstPlayerController()->GetPawn());
 	BeepLight->SetVisibility(false);
+
+	SetActorTickEnabled(false);
 }
 
 // Called every frame
@@ -76,6 +78,7 @@ void AWeponPipeBomb::PipeBombInteraction()
 	//몽타주 특정시점(추가필요)에서 무기해제 (던지고 나서도 손에 들고있으면 안됨)
 	me->CurrentWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	bIsThrown = true;
+	SetActorTickEnabled(true);
 	
 	//몽타주 플레이
 	if (me->CurrentWeapon->WeaponData.WeaponFireMontage)

@@ -6,7 +6,6 @@
 #include "EWeaponType.h"
 #include "FWeaponData.h"
 #include "GameFramework/Actor.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 #include "WeaponBase.generated.h"
 
 UCLASS()
@@ -23,9 +22,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	
 	//외관
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class USphereComponent* Root = nullptr;
@@ -46,7 +42,7 @@ public:
 
 	//SKYE: 월드에 소환된 무기(장착X)와 내가 장착하고 있는 무기를 구분하기 위한 설정 추가
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Weapon")
-	bool IsEquipped;
+	bool IsEquipped = false;
 	void SetEquipped(bool bEquip);
 
 	//트레이싱 됐을때 overlay 재질 설정해주는 함수

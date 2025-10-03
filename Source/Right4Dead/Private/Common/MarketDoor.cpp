@@ -104,6 +104,9 @@ AMarketDoor::AMarketDoor()
 void AMarketDoor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetActorTickEnabled(false);
+	
 	ZombieSpawnManager = Cast<AZombieSpawnManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AZombieSpawnManager::StaticClass()));
 
 	LeftHinge->SetRelativeRotation(FRotator(0, -90, 0));

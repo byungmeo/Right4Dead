@@ -13,7 +13,7 @@
 AWeaponBase::AWeaponBase()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	//외관
 	Root=CreateDefaultSubobject<USphereComponent>(TEXT("Root"));
@@ -44,14 +44,6 @@ void AWeaponBase::BeginPlay()
 	// 시작하면 총알수를 세팅해주고
 	WeaponData.CurrentAmmo = WeaponData.MaxAmmo;
 	SlotType = WeaponData.WeaponName;
-}
-
-// Called every frame
-void AWeaponBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	IsEquipped = false;
-
 }
 
 void AWeaponBase::SetEquipped(bool bEquip)

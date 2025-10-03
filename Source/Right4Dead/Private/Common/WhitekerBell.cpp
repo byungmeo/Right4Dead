@@ -8,7 +8,7 @@
 AWhitekerBell::AWhitekerBell()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	SetRootComponent(Root);
@@ -25,12 +25,6 @@ AWhitekerBell::AWhitekerBell()
 void AWhitekerBell::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-// Called every frame
-void AWhitekerBell::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 void AWhitekerBell::Interaction()

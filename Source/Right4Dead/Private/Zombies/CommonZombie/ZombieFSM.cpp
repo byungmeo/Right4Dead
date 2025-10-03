@@ -9,6 +9,8 @@
 UZombieFSM::UZombieFSM()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	
+	bAutoActivate = true;
 }
 
 void UZombieFSM::BeginPlay()
